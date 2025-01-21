@@ -1,24 +1,11 @@
 # Sports Hub - Project Management Application
 
-__Name:__ David Antrobius
-
-__Computing ID:__ daa6z
-
-<br>
-
-__Name:__ Daivik Siddhi
-
-__Computing ID:__ awr7mj
-
-<br>
-
 __Name:__ Elijah Kim
 
-__Computing ID:__ cys8qu
+__Role:__ Software Architect
 
-<br>
-
-__Name:__ Riley Fletcher
-
-__Computing ID:__ xmj5cf
+August 2024 - December 2024
+- Co-developed an app where users can schedule activities based on a time, date, skill level, type of sport, and location
+- Led the analysis and implementation of major requirements changes, documented technical solutions, and guided a 5 person team through the integration process
+- Deployed the application on Heroku using streamlined CI/CD pipelines, enhancing deployment frequency from bi-weekly to daily updates while ensuring consistent uptime of over 99.9%
 
