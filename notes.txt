@@ -1,0 +1,30 @@
+Project Related Notes (Riley)
+-----------------------------
+
+Heroku
+------
+Our app configuration is setup via the webapp, which means we do not need to configure anything in our GitHub workflows
+for Heroku-specific deployments, and also means that using the Heroku CLI is not necessary (so far).
+
+GitHub Actions
+--------------
+Currently configured for Python 3.12.
+First runs tests via GitHub actions, if tests pass it will send to Heroku. It can still fail once in Heroku for other reasons.
+
+Django
+------
+Allowed hosts must have our Heroku URL in order to avoid a DisallowedHosts error, optionally we may be able to change the URL
+and also add ".herokuapp.com" to allow any arbitrary Heroku domain for hosting the project.
+
+PostgreSQL
+----------
+Database setup has not begun yet.
+
+Whitenoise
+----------
+Django does not support static asset serving, to fix this we have Whitenoise enabled (hence why we have it in middleware).
+I don't fully understand this yet, but these links provide good additional info if one is curious.
+
+https://whitenoise.readthedocs.io/en/stable/django.html
+https://devcenter.heroku.com/articles/django-assets
+

@@ -1,0 +1,47 @@
+{% load socialaccount %}
+{% load bootstrap5 %}
+
+{% bootstrap_css %}
+{% bootstrap_javascript %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Django Google Sign In</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .content {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h2 class="mb-4">Google Login</h2>
+        {% if user.is_authenticated %}
+            <p>Welcome, {{ user.first_name }} {{ user.last_name }}</p>
+            <p>You are signed in as {{ user.email }}</p>
+            {% if user.is_admin %}
+                <p>You are an admin.</p>
+            {% else %}
+                <p>You are not an admin.</p>
+            {% endif %}
+            <a href="logout" class="btn btn-outline-danger">Logout</a>
+        {% else %}
+            <a href="{% provider_login_url 'google' %}?next=/" class="btn btn-primary">Login With Google</a>
+        {% endif %}
+    </div>
+</body>
+</html>
+

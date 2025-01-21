@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Contact Us - Sports Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="text-center mb-4">Contact Us</h1>
+            
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3>Get in Touch</h3>
+                    <p>Contact us here.</p>
+
+                    <div class="mt-4">
+                        <h4>Primary Contact</h4>
+                        <ul class="list-unstyled">
+                            <li class="mb-3">
+                                <i class="bi bi-envelope-fill me-2"></i>
+                                Email: <a href="mailto:daa6z@virginia.edu">daa6z@virginia.edu</a>
+                            </li>
+                            <li class="mb-3">
+                                <i class="bi bi-geo-alt-fill me-2"></i>
+                                Location: Rice Hall, University of Virginia
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- https://stackoverflow.com/questions/57543134/how-to-link-facebook-icon-used-in-bootstrap-4-with-my-actual-facebook-account-or -->
+                    <div class="mt-4">
+                        <h4>Social Media</h4>
+                        <ul class="list-unstyled">
+                            <li class="mb-2"><i class="bi bi-twitter me-2"></i>Twitter: TBD</li>
+                            <li class="mb-2"><i class="bi bi-facebook me-2"></i>Facebook: TBD</li>
+                            <li class="mb-2"><i class="bi bi-instagram me-2"></i>Instagram: TBD</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4">
+                        <h4>Project Information</h4>
+                        <p>This is a student project developed for CS3240 at the University of Virginia.</p>
+                        <p>Repository: <a href="https://github.com/uva-cs3240-f24/project-b-28" target="_blank">GitHub</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

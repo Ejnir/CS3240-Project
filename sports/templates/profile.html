@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ user.username }}'s Profile{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <h1 class="mb-4">{{ user.username }}'s Profile</h1>
+            
+            {% if user.is_admin or user.is_staff or user.is_superuser %}
+                <div class="alert alert-info">
+                    <i class="bi bi-shield-fill"></i> 
+                    {% if user.is_superuser %}
+                        You are a Superuser Admin
+                    {% elif user.is_admin %}
+                        You are an Admin
+                    {% elif user.is_staff %}
+                        You are a Staff Member
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Basic Information</h4>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item"><strong>Real Name:</strong> {{ user.real_name }}</li>
+                        <li class="list-group-item"><strong>Email:</strong> {{ user.email }}</li>
+                        <li class="list-group-item"><strong>Joined:</strong> {{ user.date_joined_pma|date:"F j, Y" }}</li>
+                        {% if user.interests %}
+                            <li class="list-group-item"><strong>Interests:</strong> {{ user.interests }}</li>
+                        {% endif %}
+                    </ul>
+                </div>
+
+                <div class="col-md-6">
+                    <h4>My Events</h4>
+                    <div class="list-group">
+                        {% for membership in user.projectmembership_set.all %}
+                            <a href="{% url 'project_detail' membership.project.pk %}" 
+                               class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">{{ membership.project.title }}</h5>
+                                    <small>
+                                        {% if membership.project.owner == user %}
+                                            <span class="badge bg-primary">Owner</span>
+                                        {% elif membership.status == 'member' %}
+                                            <span class="badge bg-success">Member</span>
+                                        {% else %}
+                                            <span class="badge bg-warning text-dark">Pending</span>
+                                        {% endif %}
+                                    </small>
+                                </div>
+                                <small class="text-muted">
+                                    {{ membership.project.event_date|date:"M d, Y H:i" }}
+                                </small>
+                            </a>
+                        {% empty %}
+                            <p class="text-muted">Not participating in any events yet.</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

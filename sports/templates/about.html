@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}About Us - Sports Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="text-center mb-4">About Sports Hub</h1>
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h3>Our Story</h3>
+                    <p>Sports Hub is as a CS3240 Software Development project at the University of Virginia. Its mission is to provide a platform driven by our passion for sports and community building. As students who are passionate about pickup games and organized sporting, we saw an opportunity to create something personally interesting.</p>
+                    
+                    <h3 class="mt-4">Our Mission</h3>
+                    <p>In a broader context, this application could make sporting as a whole more approachable for entire the UVA community. Sports Hub intends to connect people with fellow enthusiasts who share interests.</p>
+
+                    <h3 class="mt-4">Key Features</h3>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3">🏃</div>
+                                <div>
+                                    <h5>Event Creation</h5>
+                                    <p>Easily create and manage sports events, from pickup games to tournaments.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3">🤝</div>
+                                <div>
+                                    <h5>Team Building</h5>
+                                    <p>Find teammates based on skill level and availability.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3">📅</div>
+                                <div>
+                                    <h5>Scheduling</h5>
+                                    <p>Coordinate game times that work for everyone.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-start mb-3">
+                                <div class="me-3">📍</div>
+                                <div>
+                                    <h5>Venue Management</h5>
+                                    <p>Find and share the best spots for your sport.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="mt-4">The Team</h3>
+                    <div class="row mt-3">
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">David Antrobius</h5>
+                                    <p class="card-text text-muted">Scrum Master</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Riley</h5>
+                                    <p class="card-text text-muted">DevOps Manager</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Elijah</h5>
+                                    <p class="card-text text-muted">Requirements Manager</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card mb-3">
+                                <div class="card-body">
+                                    <h5 class="card-title">Daivik</h5>
+                                    <p class="card-text text-muted">Testing Manager</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 class="mt-4">Technical Stack</h3>
+                    <p>Built with modern technologies including:</p>
+                    <ul>
+                        <li>Django Web Framework</li>
+                        <li>PostgreSQL Database</li>
+                        <li>Bootstrap 5 for UI</li>
+                        <li>AWS S3 for File Storage</li>
+                        <li>Heroku for Deployment</li>
+                    </ul>
+
+                    <div class="text-center mt-5">
+                        <p class="lead">Join Now</p>
+                        <a href="{% url 'account_login' %}" class="btn btn-primary btn-lg">Get Started</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

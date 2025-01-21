@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Event{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="my-4">Create New Event</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.title.label_tag }}
+                {{ form.title }}
+                {% if form.title.errors %}
+                    <div class="text-danger">{{ form.title.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                {{ form.event_date.label_tag }}
+                {{ form.event_date }}
+                {% if form.event_date.errors %}
+                    <div class="text-danger">{{ form.event_date.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mb-3">
+            {{ form.description.label_tag }}
+            {{ form.description }}
+            {% if form.description.errors %}
+                <div class="text-danger">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label for="sport_type" class="form-label">Sport Type</label>
+                <select name="sport_type" id="sport_type" class="form-select">
+                    <option value="">Select a Sport</option>
+                    {% for value, label in form.instance.SPORT_CHOICES %}
+                        <option value="{{ value }}">{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="skill_level_slider" class="form-label">Skill Level (Optional)</label>
+                <input type="range" min="1" max="5" step="1" id="skill_level_slider" name="skill_level" class="form-range">
+                <div class="d-flex justify-content-between">
+                    <small>Beginner</small>
+                    <small>Pro</small>
+                </div>
+                <p id="skill_level_display" class="mt-2">Intermediate</p>
+                <input type="hidden" name="skill_level" id="skill_level_hidden" value="3">
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ form.zip_code.label_tag }}
+                {{ form.zip_code }}
+                {% if form.zip_code.errors %}
+                    <div class="text-danger">{{ form.zip_code.errors }}</div>
+                {% endif %}
+            </div>
+            <div class="col-md-6">
+                {{ form.venue.label_tag }}
+                {{ form.venue }}
+                {% if form.venue.errors %}
+                    <div class="text-danger">{{ form.venue.errors }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Create Event</button>
+        <a href="{% url 'project_list' %}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+
+<script>
+    const skillLevelSlider = document.getElementById('skill_level_slider');
+    const skillLevelDisplay = document.getElementById('skill_level_display');
+    const skillLevelHidden = document.getElementById('skill_level_hidden');
+
+    const skillLevels = {
+        1: 'Beginner',
+        2: 'Intermediate',
+        3: 'Advanced',
+        4: 'Expert',
+        5: 'Pro'
+    };
+
+    skillLevelSlider.addEventListener('input', function() {
+        const value = this.value;
+        skillLevelDisplay.textContent = skillLevels[value];
+        skillLevelHidden.value = value;
+    });
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const value = skillLevelSlider.value;
+        skillLevelDisplay.textContent = skillLevels[value];
+        skillLevelHidden.value = value;
+    });
+</script>
+{% endblock %}

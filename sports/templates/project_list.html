@@ -1,0 +1,146 @@
+{% extends 'base.html' %}
+
+{% block title %}Upcoming Events{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Filter Section -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Upcoming Events</h1>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <form method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <label for="zip_code" class="form-label">Zip Code</label>
+                            <input type="text" class="form-control" id="zip_code" name="zip_code" 
+                                   value="{{ zip_code }}" placeholder="e.g. 22903">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="sport_type" class="form-label">Sport</label>
+                            <select class="form-select" id="sport_type" name="sport_type">
+                                <option value="">All Sports</option>
+                                {% for value, label in sport_choices %}
+                                    <option value="{{ value }}" {% if sport_type == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="skill_level" class="form-label">Skill Level</label>
+                            <select class="form-select" id="skill_level" name="skill_level">
+                                <option value="">Any Skill Level</option>
+                                {% for value, label in skill_choices %}
+                                    <option value="{{ value }}" {% if skill_level == value %}selected{% endif %}>
+                                        {{ label }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <button type="submit" class="btn btn-primary">Search</button>
+                            <a href="{% url 'project_list' %}" class="btn btn-outline-secondary">Clear</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Project List Section -->
+    <div class="row">
+        {% if projects %}
+            {% for project in projects %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ project.title }}</h5>
+                            
+                            {% if project.user_status %}
+                                {% if project.user_status.status == 'member' %}
+                                    <span class="badge bg-success">Member</span>
+                                {% elif project.user_status.status == 'requested' %}
+                                    <span class="badge bg-warning text-dark">Request Pending</span>
+                                {% endif %}
+                            {% endif %}
+                            
+                            <p class="card-text">
+                                {% if project.description %}
+                                    {{ project.description|truncatewords:20 }}
+                                {% else %}
+                                    <em>No description provided.</em>
+                                {% endif %}
+                            </p>
+                            <p>
+                                <strong>Host:</strong> {{ project.owner.username }}<br>
+                                <strong>Event Date:</strong> {{ project.event_date|date:"M d, Y H:i" }}
+                            </p>
+                            {% if project.sport_type %}
+                                <p><strong>Sport:</strong> {{ project.get_sport_type_display }}</p>
+                            {% endif %}
+                            {% if project.skill_level %}
+                                <p><strong>Skill Level:</strong> {{ project.get_skill_level_display }}</p>
+                            {% endif %}
+                            {% if project.zip_code %}
+                                <p><strong>Zip Code:</strong> {{ project.zip_code }}</p>
+                            {% endif %}
+                            {% if project.venue %}
+                                <p><strong>Venue:</strong> {{ project.venue }}</p>
+                            {% endif %}
+                        </div>
+                        <div class="card-footer d-flex justify-content-between align-items-center">
+                            <div>
+                                {% if user.is_admin %}
+                                    <form method="post" action="{% url 'delete_project' project.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                                    </form>
+                                {% endif %}
+                                <a href="{% url 'project_detail' project.id %}" class="btn btn-primary btn-sm">Details</a>
+                                {% if user.is_authenticated and not user.is_admin %}
+                                    {% if user not in project.members.all and user != project.owner %}
+                                    <form method="post" action="{% url 'request_join_project' project.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-success btn-sm">Join</button>
+                                    </form>
+                                {% elif user == project.owner %}
+                                    <span class="badge bg-info">Owner</span>
+                                {% elif project.user_status and project.user_status.status == 'member' %}
+                                    <form method="post" action="{% url 'leave_project' project.id %}" class="d-inline">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-warning btn-sm">Leave</button>
+                                    </form>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <small class="text-muted">
+                            {{ project.members.count }} member{{ project.members.count|pluralize }}
+                        </small>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    No events found matching your criteria.
+                    {% if user.is_authenticated and not user.is_admin %}
+                        <br>
+                        <a href="{% url 'create_project' %}" class="btn btn-primary mt-3">Create a New Event</a>
+                    {% endif %}
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12 text-center">
+            <p>No upcoming events. Be the first to create one!</p>
+            {% if user.is_authenticated and not user.is_admin %}
+                <a href="{% url 'create_project' %}" class="btn btn-primary">Create a New Event</a>
+            {% endif %}
+        </div>
+    {% endif %}
+</div>
+</div>
+{% endblock %}

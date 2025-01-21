@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ project.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if user.is_admin %}
+    <div class="alert alert-info">
+        <strong>Admin View:</strong> You have administrative access to this event.
+    </div>
+    {% endif %}
+
+    {% if membership_pending %}
+    <div class="alert alert-warning">
+        <strong>Pending Request:</strong> Your request to join this event is awaiting approval.
+    </div>
+    {% endif %}
+
+    <h1>{{ project.title }}</h1>
+    <p>{{ project.description }}</p>
+    <p><strong>Owner:</strong> {{ project.owner.username }}</p>
+    <p><strong>Event Date:</strong> {{ project.event_date|date:"M d, Y H:i" }}</p>
+    {% if project.skill_level %}
+        <p><strong>Skill Level:</strong> {{ project.get_skill_level_display }}</p>
+    {% endif %}
+    {% if project.zip_code %}
+        <p><strong>Zip Code:</strong> {{ project.zip_code }}</p>
+    {% endif %}
+    {% if project.venue %}
+        <p><strong>Venue:</strong> {{ project.venue }}</p>
+    {% endif %}
+    <p><strong>Members:</strong> {{ project.members.count }}</p>
+    
+    {% if user == project.owner or user.is_admin %}
+    <a href="{% url 'delete_project' project.pk %}" class="btn btn-danger">Delete Event</a>
+    <a href="{% url 'manage_requests' project.pk %}" class="btn btn-secondary">Manage Join Requests</a>
+    {% endif %}
+
+    {% if is_member or user.is_admin or user == project.owner %}
+        <a href="{% url 'upload_file' project.pk %}" class="btn btn-primary">Upload File</a>
+        <a href="{% url 'post_message' project.pk %}" class="btn btn-primary">Post Message</a>
+    {% endif %}
+
+    {% if is_member or user.is_admin or user == project.owner %}
+        <h2>Files</h2>
+        <ul class="list-group">
+            {% for file in files %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <a href="{{ file.file.url }}" target="_blank">{{ file.title }}</a>
+                            <small class="text-muted">uploaded by {{ file.uploaded_by.username }} at {{ file.uploaded_at|date:"M d, Y H:i" }}</small>
+                            {% if file.tags.all %}
+                                <div class="mt-2">
+                                    {% for tag in file.tags.all %}
+                                        <span class="badge bg-primary">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <button
+                                class="btn btn-sm btn-dark"
+                                data-file-id="{{ file.id }}"
+                                onclick="showFilePreview(this)">Preview File
+                            </button>
+                            <button
+                                class="btn btn-sm btn-info"
+                                data-file-id="{{ file.id }}"
+                                onclick="showMetadata(this)">View Metadata
+                            </button>
+
+                            {% if user == file.uploaded_by or user.is_admin %}
+                                <a href="{% url 'delete_file' project.pk file.id %}" class="btn btn-sm btn-danger">Delete</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </li>
+            {% empty %}
+                <p>No files uploaded yet.</p>
+            {% endfor %}
+        </ul>
+
+        <h2>Messages</h2>
+        <ul class="list-group">
+            {% for message in messages reversed %}
+                <li class="list-group-item">
+                    <p><strong>{{ message.author.username }}:</strong> {{ message.content }}</p>
+                    <p><small>Posted at {{ message.posted_at|date:"M d, Y H:i" }}</small></p>
+                </li>
+            {% empty %}
+                <p>No messages yet.</p>
+            {% endfor %}
+        </ul>
+
+        <h2>Members</h2>
+        <ul class="list-group">
+            {% for member in members %}
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+                <span>{{ member.username }} ({{ member.real_name }})</span>
+                {% if user.is_admin or user == project.owner %}
+                    {% if member != user %}  <!-- Don't show kick button for self -->
+                        <form method="post" class="d-inline">
+                            {% csrf_token %}
+                            <input type="hidden" name="user_id" value="{{ member.id }}">
+                            <button type="submit" name="kick_member" class="btn btn-sm btn-danger">Kick</button>
+                        </form>
+                    {% endif %}
+                {% endif %}
+            </li>
+        {% empty %}
+            <p>No members yet.</p>
+        {% endfor %}
+        </ul>
+    {% endif %}
+</div>
+
+<div class="modal fade" id="metadataModal" tabindex="-1" aria-labelledby="metadataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="metadataModalLabel">File Metadata</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>File Title:</strong> <span id="modalFileTitle"></span></p>
+                <p><strong>Timestamp of Submission:</strong> <span id="modalTimestamp"></span></p>
+                <p><strong>Description:</strong> <span id="modalDescription"></span></p>
+                <p><strong>Tags:</strong> <span id="modalKeywords"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="filePreviewModal" tabindex="-1" aria-labelledby="filePreviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="filePreviewModalLabel">File Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="textPreview" style="display: none;">
+                    <pre id="textContent" style="white-space: pre-wrap;"></pre>
+                </div>
+                <div id="imagePreview" style="display: none;">
+                    <img id="imageContent" style="max-width: 100%;" alt="File preview">
+                </div>
+                <div id="pdfPreview" style="display: none;">
+                    <iframe id="pdfContent" style="width: 100%; height: 500px;" frameborder="0"></iframe>
+                </div>                
+                <div id="previewError" style="display: none;" class="alert alert-danger"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function showMetadata(button) {
+        const fileId = button.getAttribute('data-file-id');
+
+        fetch(`/projects/file_metadata/${fileId}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    const metadata = data.metadata;
+                    document.getElementById('modalFileTitle').textContent = metadata.title || "Untitled";
+                    document.getElementById('modalTimestamp').textContent = metadata.timestamp || "N/A";
+                    document.getElementById('modalDescription').textContent = metadata.description || "No description provided.";
+                    const keywordsContainer = document.getElementById('modalKeywords');
+                    if (metadata.tags && metadata.tags.length > 0) {
+                        keywordsContainer.textContent = metadata.tags.join(', ');
+                    } else {
+                        keywordsContainer.textContent = "No tags.";
+                    }
+
+                    new bootstrap.Modal(document.getElementById('metadataModal')).show();
+                }
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('An error occurred while fetching metadata.');
+            });
+    }
+
+    function showFilePreview(button) {
+        const fileId = button.getAttribute('data-file-id');
+        fetch(`/projects/file_contents/${fileId}/`)
+            .then(response => response.json())
+            .then(data => {
+                const textPreview = document.getElementById('textPreview');
+                const imagePreview = document.getElementById('imagePreview');
+                const previewError = document.getElementById('previewError');
+                const pdfPreview = document.getElementById('pdfPreview');
+
+                textPreview.style.display = 'none';
+                imagePreview.style.display = 'none';
+                previewError.style.display = 'none';
+                pdfPreview.style.display = 'none';
+
+                if (data.error) {
+                    previewError.textContent = data.error;
+                    previewError.style.display = 'block';
+                } else if (data.type === 'text') {
+                    document.getElementById('textContent').textContent = data.content;
+                    textPreview.style.display = 'block';
+                } else if (data.type === 'image') {
+                    document.getElementById('imageContent').src = data.content;
+                    imagePreview.style.display = 'block';
+                } else if (data.type === 'pdf') {
+                    document.getElementById('pdfContent').src = data.url;
+                    pdfPreview.style.display = 'block';
+                }
+
+                new bootstrap.Modal(document.getElementById('filePreviewModal')).show();
+            })
+            .catch(error => {
+                console.error('Fetch error:', error);
+                alert('An error occurred while fetching the file preview.');
+            });
+    }
+</script>
+{% endblock %}
